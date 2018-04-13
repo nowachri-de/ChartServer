@@ -85,24 +85,24 @@ public abstract class Chart {
      * @param objectAsJson JSON message which is send to the server via a POST request
      * @return Content of server response as string
      */
-    protected String send(String path, String objectAsJson) {
+    protected String send(String path, Object obj) {
 
         if (path == null || path.isEmpty()) {
             throw new RuntimeException("Path must be specified but was " + path);
         }
-        if (objectAsJson == null) {
+        if (obj == null) {
             throw new RuntimeException("No object specified");
         }
 
         String uri = this.getBaseURL()+path;
         
-        Logger.info("Send request to " + uri);
+        Logger.debug("Send request to " + uri);
         
         CloseableHttpClient client = getClient();
         HttpPost httpPost = new HttpPost(this.getBaseURL()+path);
         try {
 
-            httpPost.setEntity(new StringEntity(objectAsJson));
+            httpPost.setEntity(new StringEntity(obj.toString()));
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Accept", "text/html");
             httpPost.setHeader("Content-type", "application/json");

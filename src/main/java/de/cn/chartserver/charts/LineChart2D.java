@@ -48,7 +48,7 @@ public class LineChart2D extends Chart{
     public String draw(double[] yvalues){
         this.data = yvalues;
 
-        return super.send(PATH,(new Gson()).toJson(new DTOLineChart2D(yvalues)));
+        return super.send(PATH,new DTOLineChart2D(this.data));
     }
 
     public double[] getData() {
