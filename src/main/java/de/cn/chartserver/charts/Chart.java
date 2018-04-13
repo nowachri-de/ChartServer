@@ -108,7 +108,9 @@ public abstract class Chart {
             httpPost.setHeader("Content-type", "application/json");
 
             HttpResponse response = client.execute(httpPost);
-            return ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+            String result = ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8);
+            response.getEntity().getContent().close();
+            return result;
         } catch (UnsupportedEncodingException e) {
             Logger.error(e);
         } catch (ClientProtocolException e) {
@@ -117,7 +119,7 @@ public abstract class Chart {
             Logger.error(e);
         }
 
-        return "An error occured";
+        return "An error occured when calling the server";
     }
 
     protected CloseableHttpClient getClient() {
