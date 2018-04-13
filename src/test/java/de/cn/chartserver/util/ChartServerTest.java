@@ -17,13 +17,11 @@ import de.cn.chartserver.handler.TestHandler;
 import fi.iki.elonen.NanoHTTPD;
 
 public class ChartServerTest {
-    protected final int SERVER_PORT = 8080;
-    
     ChartServer server;
     
     @Before
     public void setup(){
-        server = ChartServer.createNewInctance(SERVER_PORT);
+        server = ChartServer.createNewInctance();
     }
     
     @After
@@ -38,12 +36,13 @@ public class ChartServerTest {
         server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         
         CloseableHttpClient client = TestUtil.newHttpClientInstance();
-        HttpGet httpGet = new HttpGet("https://localhost:" + SERVER_PORT + "/test");
+        HttpGet httpGet = new HttpGet("https://localhost:" + server.getListeningPort() + "/test");
         httpGet.setHeader("Accept", "text/html");
      
         HttpResponse response = client.execute(httpGet);
         Assert.assertTrue(response.getStatusLine().getStatusCode() == 200);
-        Assert.assertEquals("<html><body>This is a ChartServer</body></html>", ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));      
+        Assert.assertEquals("<html><body>This is a ChartServer</body></html>", ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));
+        response.getEntity().getContent().close();
     }
     
     @Test
@@ -53,13 +52,13 @@ public class ChartServerTest {
         server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         
         CloseableHttpClient client = TestUtil.newHttpClientInstance();
-        HttpGet httpGet = new HttpGet("https://localhost:" + SERVER_PORT + "/example1");
+        HttpGet httpGet = new HttpGet("https://localhost:" + server.getListeningPort() + "/example1");
         httpGet.setHeader("Accept", "text/html");
      
         HttpResponse response = client.execute(httpGet);
         Assert.assertTrue(response.getStatusLine().getStatusCode() == 200);
         Assert.assertEquals(ResourceFileHandler.inputStreamToString(response.getEntity().getContent(),StandardCharsets.UTF_8),ResourceFileHandler.getResourceAsString("html/samples/example1.html"));
-        System.out.println();
+        response.getEntity().getContent().close();
     }
     
 }

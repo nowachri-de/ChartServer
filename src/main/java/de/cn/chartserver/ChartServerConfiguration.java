@@ -59,8 +59,8 @@ public class ChartServerConfiguration {
 	 * @return ChartServerConfiguration being set to the provided parameters
 	 */
 	public static ChartServerConfiguration createConfiguration(String host, int serverPort) {
-		ChartServerConfiguration config = new ChartServerConfiguration();
-		config.setPort(serverPort);
+		ChartServerConfiguration config = createConfiguration(serverPort);
+		config.setHost(host);
 		return config;
 	}
 
