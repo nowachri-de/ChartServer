@@ -109,10 +109,10 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven-compiler-version}</version>
+				<version>3.1</version>
 				<configuration>
-					<source>${java-source-verion}</source>
-					<target>${java-target-verion}</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 		</plugins>
