@@ -20,10 +20,13 @@ import fi.iki.elonen.router.RouterNanoHTTPD;
 public class ChartServer extends RouterNanoHTTPD {
     protected Options options;
 
+    /**
+     * Constructor expecting server listening port
+     * 
+     * @param port Server is listening at given port
+     */
     protected ChartServer(int port)  {
-        
         super(port);
-        
         setupSSL();
         setOptions(setupOptions());
         setupHandlers();

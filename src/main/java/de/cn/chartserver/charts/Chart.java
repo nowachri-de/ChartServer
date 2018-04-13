@@ -23,26 +23,50 @@ import org.pmw.tinylog.Logger;
 import de.cn.chartserver.ChartServerConfiguration;
 import de.cn.chartserver.util.ResourceFileHandler;
 
+
+/**
+ * Base class for chart classes implementing concrete charts
+ *
+ */
 public abstract class Chart {
     private ChartServerConfiguration configuration;
     private SSLContext sslContext = null;
     private CloseableHttpClient client = null;
 
+    /**
+     * No arg constructor
+     */
     public Chart() {
         configuration = ChartServerConfiguration.createConfiguration();
         createClosableHttpClient();
     }
 
+    /**
+     * Constructor expecting port at which server is listening as parameter
+     * 
+     * @param port Port at which server is listening
+     */
     public Chart(int port) {
         configuration = ChartServerConfiguration.createConfiguration(port);
         createClosableHttpClient();
     }
 
+    /**
+     * Constructor expecting port at which server is listening as parameter as well of the servers
+     * hostname
+     * 
+     * @param host Hostname of server
+     * @param port Port at which server is listening
+     */
     public Chart(String host, int port) {
         configuration = ChartServerConfiguration.createConfiguration(host, port);
         createClosableHttpClient();
     }
 
+    /**
+     * Creates an instance of a ClosableHttpClient which expects every certificate.
+     * Not very secure, but this code is definitelly not tuned for security.
+     */
     protected void createClosableHttpClient() {
         try {
             sslContext = new SSLContextBuilder().loadTrustMaterial(null, (certificate, authType) -> true).build();
@@ -52,6 +76,15 @@ public abstract class Chart {
         }
     }
 
+    /**
+     * Request the server to display the chart corresponding to the given path.
+     * The data to be displayed is path of the JSON message beeing send to the 
+     * server with the post request.
+     * 
+     * @param path Path to call
+     * @param objectAsJson JSON message which is send to the server via a POST request
+     * @return Content of server response as string
+     */
     protected String send(String path, String objectAsJson) {
 
         if (path == null || path.isEmpty()) {
@@ -66,7 +99,7 @@ public abstract class Chart {
         Logger.info("Send request to " + uri);
         
         CloseableHttpClient client = getClient();
-        HttpPost httpPost = new HttpPost("https://localhost:" + 8080 + "/test");
+        HttpPost httpPost = new HttpPost(this.getBaseURL()+path);
         try {
 
             httpPost.setEntity(new StringEntity(objectAsJson));
@@ -85,7 +118,6 @@ public abstract class Chart {
         }
 
         return "An error occured";
-
     }
 
     protected CloseableHttpClient getClient() {

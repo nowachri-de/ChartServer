@@ -15,24 +15,31 @@ import fi.iki.elonen.NanoHTTPD.Response.Status;
 import fi.iki.elonen.router.RouterNanoHTTPD.DefaultHandler;
 import fi.iki.elonen.router.RouterNanoHTTPD.UriResource;
 
+/**
+ * Handler to send an example page to the client (browser)
+ *
+ */
 public class Example1Handler extends DefaultHandler {
 
+	protected final static String CONTENT_FILE="html/samples/example1.html";
     @Override
     public String getText() {
         return "not implemented";
     }
 
     /**
+     * Load the content to be send to the client from the specified 
+     * 
      * @param urlParams these parameters are provided by the framework 
      * @param session the session object is provided by the framework
      * @return content of the resource file as string, an empty string if the file could not be loaded.
      */
     public String getText(Map<String, String> urlParams, IHTTPSession session) {
         try {
-            return ResourceFileHandler.getResourceAsString("html/samples/example1.html");
+            return ResourceFileHandler.getResourceAsString(CONTENT_FILE);
         } catch (IOException e) {
             Logger.error(e);
-            return "";
+            return "An error occured when attempting to load the resource file " + CONTENT_FILE;
         }
     }
 

@@ -7,6 +7,10 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 
+/**
+ * Class to load files being located under src/main/resources
+ *
+ */
 public class ResourceFileHandler {
 
     /**

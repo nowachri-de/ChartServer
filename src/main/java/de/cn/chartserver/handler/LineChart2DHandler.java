@@ -15,8 +15,14 @@ import fi.iki.elonen.NanoHTTPD.Response.Status;
 import fi.iki.elonen.router.RouterNanoHTTPD.DefaultHandler;
 import fi.iki.elonen.router.RouterNanoHTTPD.UriResource;
 
+/**
+ * Handler to send an linechart2d html page to the client (browser)
+ *
+ */
 public class LineChart2DHandler extends DefaultHandler {
     public static final String URL="/linechart2d";
+    protected static final String CONTENT_FILE = "html/linechart2d.html";
+    
     @Override
     public String getText() {
         return "not implemented";
@@ -29,10 +35,10 @@ public class LineChart2DHandler extends DefaultHandler {
      */
     public String getText(Map<String, String> urlParams, IHTTPSession session) {
         try {
-            return ResourceFileHandler.getResourceAsString("html/linechart2d.html");
+            return ResourceFileHandler.getResourceAsString(CONTENT_FILE);
         } catch (IOException e) {
             Logger.error(e);
-            return "";
+            return "An error occured when attempting to load the resource file " + CONTENT_FILE;
         }
     }
 
