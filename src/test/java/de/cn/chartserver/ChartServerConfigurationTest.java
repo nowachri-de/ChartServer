@@ -12,7 +12,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.cn.chartserver.util.ResourceFileHandler;
+import de.cn.chartserver.resource.ResourceFileHandler;
 import de.cn.chartserver.util.TestUtil;
 
 public class ChartServerConfigurationTest {

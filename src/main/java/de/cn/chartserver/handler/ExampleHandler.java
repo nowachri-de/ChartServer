@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.pmw.tinylog.Logger;
 
-import de.cn.chartserver.util.ResourceFileHandler;
+import de.cn.chartserver.resource.ResourceFileHandler;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Response;
@@ -19,7 +19,7 @@ import fi.iki.elonen.router.RouterNanoHTTPD.UriResource;
  * Handler to send an example page to the client (browser)
  *
  */
-public class Example1Handler extends DefaultHandler {
+public class ExampleHandler extends DefaultHandler {
 
 	protected final static String CONTENT_FILE="html/samples/example1.html";
     @Override

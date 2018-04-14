@@ -15,7 +15,7 @@ import org.apache.commons.cli.ParseException;
  */
 public class ChartServerConfiguration {
 
-	public static final String DEFAULT_KEYSTORE_LOCATION = "/ssl";
+	public static final String DEFAULT_KEYSTORE_LOCATION = "ssl";
 	public static final String DEFAULT_KEYSTORE_FILENAME = "keystore.jks";
 	public static final String DEFAULT_KEYSTORE_PASSWORD = "password";
 	public static final String DEFAULT_PROCTOCOL = "https";

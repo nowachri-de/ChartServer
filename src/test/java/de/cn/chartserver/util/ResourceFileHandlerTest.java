@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.cn.chartserver.resource.ResourceFileHandler;
+
 public class ResourceFileHandlerTest {
     @Test
     public void loadResourceFileTest() throws IOException{

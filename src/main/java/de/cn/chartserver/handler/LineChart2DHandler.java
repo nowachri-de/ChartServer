@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.pmw.tinylog.Logger;
 
-import de.cn.chartserver.util.ResourceFileHandler;
+import de.cn.chartserver.resource.ResourceFileHandler;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Response;

@@ -12,7 +12,7 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import de.cn.chartserver.ChartServerConfiguration;
-import de.cn.chartserver.util.ResourceFileHandler;
+import de.cn.chartserver.resource.ResourceFileHandler;
 
 public class WebSocketTestClient extends WebSocketClient {
 

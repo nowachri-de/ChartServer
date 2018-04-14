@@ -1,6 +1,7 @@
 package de.cn.chartserver;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
@@ -10,8 +11,9 @@ import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.Logger;
 
-import de.cn.chartserver.handler.Example1Handler;
+import de.cn.chartserver.handler.ExampleHandler;
 import de.cn.chartserver.handler.LineChart2DHandler;
+import de.cn.chartserver.resource.ResourceFileHandler;
 import de.cn.chartserver.threadpool.BoundRunner;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.router.RouterNanoHTTPD;
@@ -26,17 +28,21 @@ public class ChartServer extends RouterNanoHTTPD {
 	 * 
 	 * @param config
 	 *            Configuration object of server
+	 * @throws Exception 
 	 */
-	protected ChartServer(ChartServerConfiguration config) {
+	protected ChartServer(ChartServerConfiguration config){
 		super(config.getHost(), config.getPort());
 		this.configuration = config;
+		
 		setupSSL();
 		setupHandlers();
 		setAsyncRunner(new BoundRunner(Executors.newFixedThreadPool(this.configuration.getWebThreadPoolSize())));
 
 		try {
-			setupWebSocket();
+			setupWebSocket(ResourceFileHandler.getInputStream(config.getKeyStoreLocation()+"/"+config.getKeyStoreFileName()),config.getKeyStorePassword());
 		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -44,12 +50,11 @@ public class ChartServer extends RouterNanoHTTPD {
 
 	/**
 	 * Instantiates the websocket at the port specified in the configuration
-	 * 
-	 * @throws UnknownHostException
+	 * @throws Exception 
 	 */
-	protected void setupWebSocket() throws UnknownHostException{
+	protected void setupWebSocket(InputStream keyStoreInputStream,String passphrase) throws Exception{
 		webSocket = new ChartWebSocket(this.configuration.getWebSocketPort());
-		webSocket.setupSSL();
+		webSocket.setupSSL(keyStoreInputStream,passphrase);
 		webSocket.start();
 	}
 	
@@ -84,7 +89,7 @@ public class ChartServer extends RouterNanoHTTPD {
 	 */
 	protected void setupHandlers() {
 		addRoute(LineChart2DHandler.URL, LineChart2DHandler.class);
-		addRoute("/example",Example1Handler.class);
+		addRoute("/example",ExampleHandler.class);
 	}
 
 	/**
@@ -103,9 +108,10 @@ public class ChartServer extends RouterNanoHTTPD {
 	 */
 	protected void setupSSL() {
 		try {
-			setupSecureSocket(configuration.getKeyStoreLocation(),
+			setupSecureSocket("/"+configuration.getKeyStoreLocation(),
 					configuration.getKeyStoreFileName(),
 					configuration.getKeyStorePassword());
+			
 		} catch (IOException e) {
 			Logger.error(e);
 		}

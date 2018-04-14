@@ -13,8 +13,8 @@ import org.junit.Test;
 
 import de.cn.chartserver.ChartServer;
 import de.cn.chartserver.ChartServerConfiguration;
-import de.cn.chartserver.handler.Example1Handler;
-import de.cn.chartserver.util.ResourceFileHandler;
+import de.cn.chartserver.handler.ExampleHandler;
+import de.cn.chartserver.resource.ResourceFileHandler;
 import de.cn.chartserver.util.TestUtil;
 import fi.iki.elonen.NanoHTTPD;
 

@@ -13,7 +13,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.pmw.tinylog.Logger;
 
 import de.cn.chartserver.ChartServerConfiguration;
-import de.cn.chartserver.util.ResourceFileHandler;
+import de.cn.chartserver.resource.ResourceFileHandler;
 
 /**
  * Base class for chart classes implementing concrete charts

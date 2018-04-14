@@ -1,4 +1,4 @@
-package de.cn.chartserver.util;
+package de.cn.chartserver.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
