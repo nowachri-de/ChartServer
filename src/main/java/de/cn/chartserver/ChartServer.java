@@ -10,8 +10,8 @@ import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.Logger;
 
+import de.cn.chartserver.handler.Example1Handler;
 import de.cn.chartserver.handler.LineChart2DHandler;
-import de.cn.chartserver.handler.TestHandler;
 import de.cn.chartserver.threadpool.BoundRunner;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.router.RouterNanoHTTPD;
@@ -84,7 +84,7 @@ public class ChartServer extends RouterNanoHTTPD {
 	 */
 	protected void setupHandlers() {
 		addRoute(LineChart2DHandler.URL, LineChart2DHandler.class);
-		addRoute("/test", TestHandler.class);
+		addRoute("/example",Example1Handler.class);
 	}
 
 	/**
@@ -103,9 +103,9 @@ public class ChartServer extends RouterNanoHTTPD {
 	 */
 	protected void setupSSL() {
 		try {
-			setupSecureSocket(ChartServerConfiguration.DEFAULT_KEYSTORE_LOCATION,
-					ChartServerConfiguration.DEFAULT_KEYSTORE_FILENAME,
-					ChartServerConfiguration.DEFAULT_KEYSTORE_PASSWORD);
+			setupSecureSocket(configuration.getKeyStoreLocation(),
+					configuration.getKeyStoreFileName(),
+					configuration.getKeyStorePassword());
 		} catch (IOException e) {
 			Logger.error(e);
 		}

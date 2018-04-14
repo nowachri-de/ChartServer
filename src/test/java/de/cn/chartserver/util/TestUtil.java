@@ -22,9 +22,7 @@ public class TestUtil {
             client = HttpClients.custom().setSSLContext(sslContext).setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
         } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
             Logger.error(e);
-            return null;
-        }        
-        return client;
-
+        }
+		return client;        
     }
 }

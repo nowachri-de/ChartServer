@@ -22,6 +22,11 @@ public class DTOLineChart2D {
         this.data = ypositions;
     }
     
+    /** 
+     * Returns a JSON representation of object
+     * 
+     * @return JSON representation of object
+     */
     @Override
     public String toString(){
 		return (new Gson()).toJson(this);

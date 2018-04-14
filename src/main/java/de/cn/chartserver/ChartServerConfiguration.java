@@ -31,6 +31,9 @@ public class ChartServerConfiguration {
 	protected int webThreadPoolSize = ChartServerConfiguration.DEFAULT_WEB_THREAD_POOL_SIZE;
 	protected String protocol = DEFAULT_PROCTOCOL;
 	protected String host = "localhost";
+	protected String keyStoreLocation = DEFAULT_KEYSTORE_LOCATION;
+	protected String keyStoreFileName = DEFAULT_KEYSTORE_FILENAME;
+	protected String keyStorePassword = DEFAULT_KEYSTORE_PASSWORD;
 
 	protected Map<String,Object> routes = new HashMap<>();
 	
@@ -180,6 +183,30 @@ public class ChartServerConfiguration {
 
 	public void setWebSocketPort(int webSocketPort) {
 		this.webSocketPort = webSocketPort;
+	}
+
+	public String getKeyStoreLocation() {
+		return keyStoreLocation;
+	}
+
+	public void setKeyStoreLocation(String keyStoreLocation) {
+		this.keyStoreLocation = keyStoreLocation;
+	}
+
+	public String getKeyStoreFileName() {
+		return keyStoreFileName;
+	}
+
+	public void setKeyStoreFileName(String keyStoreFileName) {
+		this.keyStoreFileName = keyStoreFileName;
+	}
+
+	public String getKeyStorePassword() {
+		return keyStorePassword;
+	}
+
+	public void setKeyStorePassword(String keyStorePassword) {
+		this.keyStorePassword = keyStorePassword;
 	}
 
 }

@@ -14,7 +14,6 @@ import org.junit.Test;
 import de.cn.chartserver.ChartServer;
 import de.cn.chartserver.ChartServerConfiguration;
 import de.cn.chartserver.handler.Example1Handler;
-import de.cn.chartserver.handler.TestHandler;
 import de.cn.chartserver.util.ResourceFileHandler;
 import de.cn.chartserver.util.TestUtil;
 import fi.iki.elonen.NanoHTTPD;
@@ -32,30 +31,13 @@ public class ChartServerTest {
         server.stop();
     }
 
-    @Test
-    public void simpleChartServerTest() throws IOException {
-
-        server.addRoute("/test", TestHandler.class);
-        server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-        
-        CloseableHttpClient client = TestUtil.newHttpClientInstance();
-        HttpGet httpGet = new HttpGet("https://localhost:" + server.getListeningPort() + "/test");
-        httpGet.setHeader("Accept", "text/html");
-     
-        HttpResponse response = client.execute(httpGet);
-        Assert.assertTrue(response.getStatusLine().getStatusCode() == 200);
-        Assert.assertEquals("<html><body>This is a ChartServer</body></html>", ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));
-        response.getEntity().getContent().close();
-    }
     
-    @Test
+    //@Test
     public void requestExample1PageTest() throws IOException {
-
-        server.addRoute("/example1", Example1Handler.class);
         server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         
         CloseableHttpClient client = TestUtil.newHttpClientInstance();
-        HttpGet httpGet = new HttpGet("https://localhost:" + server.getListeningPort() + "/example1");
+        HttpGet httpGet = new HttpGet("https://localhost:" + server.getListeningPort() + "/example");
         httpGet.setHeader("Accept", "text/html");
      
         HttpResponse response = client.execute(httpGet);

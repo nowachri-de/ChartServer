@@ -1,6 +1,5 @@
 package de.cn.chartserver.charts;
 
-
 import java.net.URI;
 import java.security.KeyStore;
 
@@ -20,21 +19,20 @@ import de.cn.chartserver.util.ResourceFileHandler;
  * Base class for chart classes implementing concrete charts
  *
  */
-public abstract class Chart extends WebSocketClient{
+public abstract class Chart extends WebSocketClient {
 
-    public Chart(URI uri) {
-    	super(uri);
-    	try {
+	public Chart(URI uri) {
+		super(uri);
+		try {
 			setupSSL();
 		} catch (Exception e) {
 			Logger.error(e);
 		}
-    }
+	}
 
 	@Override
 	public void onOpen(ServerHandshake handshakedata) {
 		System.out.println("Connected");
-
 	}
 
 	@Override
@@ -53,7 +51,7 @@ public abstract class Chart extends WebSocketClient{
 		ex.printStackTrace();
 
 	}
-	
+
 	public void setupSSL() throws Exception {
 		String STORETYPE = "JKS";
 

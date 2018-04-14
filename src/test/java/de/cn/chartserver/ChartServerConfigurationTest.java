@@ -10,6 +10,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.cn.chartserver.util.ResourceFileHandler;
@@ -33,12 +34,12 @@ public class ChartServerConfigurationTest {
     public void argumentTest() throws IOException, ParseException {
     	
         CloseableHttpClient client = TestUtil.newHttpClientInstance();
-        HttpGet httpGet = new HttpGet("https://localhost:8686/test");
+        HttpGet httpGet = new HttpGet("https://localhost:8686/example");
         httpGet.setHeader("Accept", "text/html");
      
         HttpResponse response = client.execute(httpGet);
         Assert.assertTrue(response.getStatusLine().getStatusCode() == 200);
-        Assert.assertEquals("<html><body>This is a ChartServer</body></html>", ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));
+        Assert.assertEquals(ResourceFileHandler.getResourceAsString("html/samples/example1.html"), ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));
         response.getEntity().getContent().close();
         
         server.stop();
