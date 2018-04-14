@@ -22,9 +22,8 @@ public class MinimalConfigurationExample {
         Thread.sleep(1000 * 60);
         
     }
-
     public static void startServer() throws IOException {
-        ChartServer server = ChartServer.createNewInctance();
+        ChartServer server = ChartServer.createNewInstance();
         server.start();
     }
     public static void draw() throws InterruptedException {

@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 public class ResourceFileHandler {
 
     /**
-     * @param resourceName name of the file beeing located in the resources folder (assuming maven project layout)
+     * @param resourceName Name of the file beeing located in the resources folder (assuming maven project layout)
      * @return Inputstream
      */
     public static InputStream getInputStream(String resourceFileName) {
@@ -26,9 +26,9 @@ public class ResourceFileHandler {
     /**
      * Return the content of the inputstream as String.
      * 
-     * @param inputStream inputstream to be read
+     * @param inputStream Inputstream to be read
      * @param charset Charset of the inputstream underlying characters
-     * @return content of inputstream as String
+     * @return content of Inputstream as String
      * @throws IOException
      */
     public static String inputStreamToString(InputStream inputStream, Charset charset) throws IOException {
@@ -36,7 +36,7 @@ public class ResourceFileHandler {
     }
 
     /**
-     * @param resourceFileName ressource file to be loaded. If the resource is located in a subfolder of src/main/resources like
+     * @param resourceFileName Ressource file to be loaded. If the resource is located in a subfolder of src/main/resources like
      *        src/main/resources/example/somefile.txt then specify the path to the file like: example/somefile.txt. Do not start the path with a leading /
      * @return content of file as String
      * @throws IOException

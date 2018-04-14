@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.cn.chartserver.ChartServer;
+import de.cn.chartserver.ChartServerConfiguration;
 import de.cn.chartserver.handler.Example1Handler;
 import de.cn.chartserver.handler.TestHandler;
 import fi.iki.elonen.NanoHTTPD;
@@ -21,7 +22,7 @@ public class ChartServerTest {
     
     @Before
     public void setup(){
-        server = ChartServer.createNewInctance();
+        server = ChartServer.createNewInstance(ChartServerConfiguration.createConfiguration(8787));
     }
     
     @After

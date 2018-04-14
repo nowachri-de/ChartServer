@@ -28,7 +28,7 @@ public class Example1Handler extends DefaultHandler {
     }
 
     /**
-     * Load the content to be send to the client from the specified 
+     * Load the content to be send to the client from the specified file
      * 
      * @param urlParams these parameters are provided by the framework 
      * @param session the session object is provided by the framework
