@@ -25,8 +25,6 @@ package de.cn.chartserver.examples;
  */
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.security.KeyStore;
@@ -64,8 +62,6 @@ class WebSocketChatClient extends WebSocketClient {
 	@Override
 	public void onClose( int code, String reason, boolean remote ) {
 		System.out.println( "Disconnected" );
-		System.exit( 0 );
-
 	}
 
 	@Override
@@ -123,6 +119,5 @@ public class SSLClientExample {
 				chatclient.send( line );
 			}
 		}
-
 	}
 }

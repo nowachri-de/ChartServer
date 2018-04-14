@@ -1,141 +1,79 @@
 package de.cn.chartserver.charts;
 
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.net.URI;
+import java.security.KeyStore;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 import org.pmw.tinylog.Logger;
 
 import de.cn.chartserver.ChartServerConfiguration;
 import de.cn.chartserver.util.ResourceFileHandler;
 
-
 /**
  * Base class for chart classes implementing concrete charts
  *
  */
-public abstract class Chart {
-    private ChartServerConfiguration configuration;
-    private SSLContext sslContext = null;
-    private CloseableHttpClient client = null;
+public abstract class Chart extends WebSocketClient{
 
-    /**
-     * No arg constructor
-     */
-    public Chart() {
-        configuration = ChartServerConfiguration.createConfiguration();
-        createClosableHttpClient();
+    public Chart(URI uri) {
+    	super(uri);
+    	try {
+			setupSSL();
+		} catch (Exception e) {
+			Logger.error(e);
+		}
     }
 
-    /**
-     * Constructor expecting port at which server is listening as parameter
-     * 
-     * @param port Port at which server is listening
-     */
-    public Chart(int port) {
-        configuration = ChartServerConfiguration.createConfiguration(port);
-        createClosableHttpClient();
-    }
+	@Override
+	public void onOpen(ServerHandshake handshakedata) {
+		System.out.println("Connected");
 
-    /**
-     * Constructor expecting port at which server is listening as parameter as well of the servers
-     * hostname
-     * 
-     * @param host Hostname of server
-     * @param port Port at which server is listening
-     */
-    public Chart(String host, int port) {
-        configuration = ChartServerConfiguration.createConfiguration(host, port);
-        createClosableHttpClient();
-    }
+	}
 
-    /**
-     * Creates an instance of a ClosableHttpClient which expects every certificate.
-     * Not very secure, but this code is definitelly not tuned for security.
-     */
-    protected void createClosableHttpClient() {
-        try {
-            sslContext = new SSLContextBuilder().loadTrustMaterial(null, (certificate, authType) -> true).build();
-            client = HttpClients.custom().setSSLContext(sslContext).setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
-        } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
-            Logger.error(e);
-        }
-    }
+	@Override
+	public void onMessage(String message) {
+		System.out.println("got: " + message);
 
-    /**
-     * Request the server to display the chart corresponding to the given path.
-     * The data to be displayed is path of the JSON message beeing send to the 
-     * server with the post request.
-     * 
-     * @param path Path to call
-     * @param objectAsJson JSON message which is send to the server via a POST request
-     * @return Content of server response as string
-     */
-    protected String send(String path, Object obj) {
+	}
 
-        if (path == null || path.isEmpty()) {
-            throw new RuntimeException("Path must be specified but was " + path);
-        }
-        if (obj == null) {
-            throw new RuntimeException("No object specified");
-        }
+	@Override
+	public void onClose(int code, String reason, boolean remote) {
+		System.out.println("Disconnected");
+	}
 
-        String uri = this.getBaseURL()+path;
-        
-        Logger.debug("Send request to " + uri);
-        
-        CloseableHttpClient client = getClient();
-        HttpPost httpPost = new HttpPost(this.getBaseURL()+path);
-        try {
+	@Override
+	public void onError(Exception ex) {
+		ex.printStackTrace();
 
-            httpPost.setEntity(new StringEntity(obj.toString()));
-            httpPost.setHeader("Accept", "application/json");
-            httpPost.setHeader("Accept", "text/html");
-            httpPost.setHeader("Content-type", "application/json");
+	}
+	
+	public void setupSSL() throws Exception {
+		String STORETYPE = "JKS";
 
-            HttpResponse response = client.execute(httpPost);
-            String result = ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8);
-            response.getEntity().getContent().close();
-            return result;
-        } catch (UnsupportedEncodingException e) {
-            Logger.error(e);
-        } catch (ClientProtocolException e) {
-            Logger.error(e);
-        } catch (IOException e) {
-            Logger.error(e);
-        }
+		KeyStore ks = KeyStore.getInstance(STORETYPE);
+		String resourcePath = "ssl/keystore.jks";
+		ks.load(ResourceFileHandler.getInputStream(resourcePath),
+				ChartServerConfiguration.DEFAULT_KEYSTORE_PASSWORD.toCharArray());
 
-        return "An error occured when calling the server";
-    }
+		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+		kmf.init(ks, ChartServerConfiguration.DEFAULT_KEYSTORE_PASSWORD.toCharArray());
 
-    protected CloseableHttpClient getClient() {
-        return client;
-    }
+		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+		tmf.init(ks);
 
-    /**
-     * @return protocol://host:port
-     */
-    protected String getBaseURL() {
+		SSLContext sslContext = null;
+		sslContext = SSLContext.getInstance("TLS");
+		sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
-        return (new StringBuilder()).append(configuration.getProtocol())
-                                    .append("://")
-                                    .append(configuration.getHost())
-                                    .append(":")
-                                    .append(configuration.getPort())
-                                    .toString();
-    }
+		SSLSocketFactory factory = sslContext.getSocketFactory();
+		setSocket(factory.createSocket());
+	}
+
 }

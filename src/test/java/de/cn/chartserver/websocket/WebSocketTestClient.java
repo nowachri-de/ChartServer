@@ -1,4 +1,4 @@
-package de.cn.chartserver.util;
+package de.cn.chartserver.websocket;
 
 import java.net.URI;
 import java.security.KeyStore;
@@ -8,17 +8,42 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.java_websocket.WebSocketImpl;
-import org.junit.Assert;
-import org.junit.Test;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 
-import de.cn.chartserver.ChartServer;
 import de.cn.chartserver.ChartServerConfiguration;
+import de.cn.chartserver.util.ResourceFileHandler;
 
+public class WebSocketTestClient extends WebSocketClient {
 
-public class SSLWebSocketClientTest {
+	public WebSocketTestClient(URI serverUri) {
+		super(serverUri);
+	}
 
-	protected void setupSSL(WebSocketTestClient testClient) throws Exception {
+	@Override
+	public void onOpen(ServerHandshake handshakedata) {
+		System.out.println("Connected");
+
+	}
+
+	@Override
+	public void onMessage(String message) {
+		System.out.println("got: " + message);
+
+	}
+
+	@Override
+	public void onClose(int code, String reason, boolean remote) {
+		System.out.println("Disconnected");
+	}
+
+	@Override
+	public void onError(Exception ex) {
+		ex.printStackTrace();
+
+	}
+	
+	public void setupSSL() throws Exception {
 		String STORETYPE = "JKS";
 
 		KeyStore ks = KeyStore.getInstance(STORETYPE);
@@ -37,18 +62,7 @@ public class SSLWebSocketClientTest {
 		sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
 		SSLSocketFactory factory = sslContext.getSocketFactory();
-		testClient.setSocket(factory.createSocket());
+		setSocket(factory.createSocket());
 	}
 
-	@Test(timeout=10000)
-	public void webSocketTest() throws Exception {
-		WebSocketImpl.DEBUG = false;
-		ChartServer chartServer = ChartServer.createNewInstance(ChartServerConfiguration.createConfiguration(8787,8789));
-		
-		WebSocketTestClient testClient = new WebSocketTestClient(new URI("wss://localhost:8789"));
-		setupSSL(testClient);
-		Assert.assertTrue(testClient.connectBlocking());
-		testClient.send("Unit Test");
-		testClient.close();
-	}
 }

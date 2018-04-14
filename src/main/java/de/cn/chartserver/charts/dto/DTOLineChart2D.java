@@ -1,6 +1,8 @@
-package de.cn.chartserver.charts;
+package de.cn.chartserver.charts.dto;
 
 import com.google.gson.Gson;
+
+import de.cn.chartserver.charts.LineChart2D;
 
 /**
  * Used as kind of a DTO object between client and server.

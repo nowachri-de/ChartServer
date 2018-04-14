@@ -121,11 +121,12 @@ public class ChartServer extends RouterNanoHTTPD {
 	public void stop() {
 		super.stop();
 		try {
-			this.webSocket.stop(5000);
-		} catch (InterruptedException e) {
+			this.webSocket.stop();
+		} catch (InterruptedException | IOException e) {
 			Logger.error(e);
 		}
 	}
+	
 	
 	protected void setupSecureSocket(String pathToKeyStore, String keyStoreFileName, String keyStorePassword)
 			throws IOException {

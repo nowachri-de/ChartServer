@@ -1,4 +1,4 @@
-package de.cn.chartserver.util;
+package de.cn.chartserver;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -15,6 +15,8 @@ import de.cn.chartserver.ChartServer;
 import de.cn.chartserver.ChartServerConfiguration;
 import de.cn.chartserver.handler.Example1Handler;
 import de.cn.chartserver.handler.TestHandler;
+import de.cn.chartserver.util.ResourceFileHandler;
+import de.cn.chartserver.util.TestUtil;
 import fi.iki.elonen.NanoHTTPD;
 
 public class ChartServerTest {

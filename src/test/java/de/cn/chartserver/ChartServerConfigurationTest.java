@@ -1,4 +1,4 @@
-package de.cn.chartserver.util;
+package de.cn.chartserver;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -12,19 +12,26 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.cn.chartserver.ChartServer;
-import de.cn.chartserver.handler.Example1Handler;
-import de.cn.chartserver.handler.TestHandler;
-import fi.iki.elonen.NanoHTTPD;
+import de.cn.chartserver.util.ResourceFileHandler;
+import de.cn.chartserver.util.TestUtil;
 
-public class ServerConfigurationTest {
-  
+public class ChartServerConfigurationTest {
+	ChartServer server;
+	@Before
+	public void startServer() throws ParseException, IOException{
+		String []args = {"-p","8686","-wsp","8687","-nws", "40"};
+        server = ChartServer.createNewInstance(args);
+        server.start();
+	}
+	
+	@After
+	public void stopServer(){
+		server.stop();
+	}
+	
     @Test
     public void argumentTest() throws IOException, ParseException {
-    	String []args = {"-p","8686","-wsp","8687","-nws", "40"};
-        ChartServer server = ChartServer.createNewInstance(args);
-        server.start();
-        
+    	
         CloseableHttpClient client = TestUtil.newHttpClientInstance();
         HttpGet httpGet = new HttpGet("https://localhost:8686/test");
         httpGet.setHeader("Accept", "text/html");
@@ -33,6 +40,8 @@ public class ServerConfigurationTest {
         Assert.assertTrue(response.getStatusLine().getStatusCode() == 200);
         Assert.assertEquals("<html><body>This is a ChartServer</body></html>", ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));
         response.getEntity().getContent().close();
+        
+        server.stop();
     }
   
     
