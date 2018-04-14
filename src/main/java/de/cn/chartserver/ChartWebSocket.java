@@ -36,10 +36,6 @@ public class ChartWebSocket extends WebSocketServer {
 	@Override
 	public void onOpen(WebSocket conn, ClientHandshake handshake) {
 		Logger.debug(conn.getRemoteSocketAddress().getAddress().getHostAddress() + " connected");
-		// conn.send("Welcome to the server!"); //This method sends a message to
-		// the new client
-		// broadcast( "new connection: " + handshake.getResourceDescriptor() );
-		// //This method sends a message to all clients connected
 	}
 
 	@Override
@@ -104,8 +100,6 @@ public class ChartWebSocket extends WebSocketServer {
 
 		try{
 			KeyStore ks = KeyStore.getInstance(STORETYPE);
-			// File kf = new File(KEYSTORE);
-			// ks.load(new FileInputStream(kf), STOREPASSWORD.toCharArray());
 			String resourcePath = "ssl/keystore.jks";
 			ks.load(ResourceFileHandler.getInputStream(resourcePath),
 					ChartServerConfiguration.DEFAULT_KEYSTORE_PASSWORD.toCharArray());
@@ -122,7 +116,5 @@ public class ChartWebSocket extends WebSocketServer {
 		}catch(Exception e){
 			Logger.error(e);
 		}
-		
-		
 	}
 }
