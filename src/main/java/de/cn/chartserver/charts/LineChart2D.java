@@ -2,8 +2,6 @@ package de.cn.chartserver.charts;
 
 import java.net.URI;
 
-import org.pmw.tinylog.Logger;
-
 import de.cn.chartserver.charts.dto.DTOLineChart2D;
 
 /**
@@ -23,12 +21,11 @@ public class LineChart2D extends Chart {
 		this.data = yvalues;
 		try {
 			this.connectBlocking();
+			this.send((new DTOLineChart2D(data)).toString());
+			this.closeBlocking();
 		} catch (InterruptedException e) {
-			Logger.error(e);
-			return;
+			throw new RuntimeException(e);
 		}
-		this.send((new DTOLineChart2D(data)).toString());
-		this.close();
 	}
 
 	public double[] getData() {

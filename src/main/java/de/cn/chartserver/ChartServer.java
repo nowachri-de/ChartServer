@@ -14,9 +14,11 @@ import org.pmw.tinylog.Level;
 import org.pmw.tinylog.Logger;
 
 import de.cn.chartserver.handler.ExampleHandler;
+import de.cn.chartserver.handler.JavaScriptHandler;
 import de.cn.chartserver.handler.LineChart2DHandler;
 import de.cn.chartserver.resource.ResourceFileHandler;
 import de.cn.chartserver.threadpool.BoundRunner;
+import de.cn.chartserver.websocket.ChartWebSocket;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.router.RouterNanoHTTPD;
 import fi.iki.elonen.util.ServerRunner;
@@ -102,10 +104,21 @@ public class ChartServer extends RouterNanoHTTPD {
 	 * Add a route to this server. A route will execute the specified handler if the path is matched
 	 */
 	protected void setupHandlers() {
+		addRoute("/",de.cn.chartserver.handler.IndexHandler.class);
+		addRoute("/js/chartserver.js",JavaScriptHandler.class);
 		addRoute(LineChart2DHandler.URL, LineChart2DHandler.class);
 		addRoute("/example",ExampleHandler.class);
 	}
 
+	/**
+     * Add the routes Every route is an absolute path Parameters starts with ":"
+     * Handler class should implement @UriResponder interface If the handler not
+     * implement UriResponder interface - toString() is used
+     */
+    @Override
+    public void addMappings() {
+       
+    }
 	/**
 	 * @see fi.iki.elonen.router.RouterNanoHTTPD#addRoute(java.lang.String,
 	 *      java.lang.Class, java.lang.Object[])
@@ -113,7 +126,7 @@ public class ChartServer extends RouterNanoHTTPD {
 	@Override
 	public void addRoute(String url, Class<?> handler, Object... initParameter) {
 		configuration.routes.put(url, handler);
-		super.addRoute(url, handler, initParameter);
+		super.addRoute(url, handler, this.getConfiguration());
 	}
 
 	/**

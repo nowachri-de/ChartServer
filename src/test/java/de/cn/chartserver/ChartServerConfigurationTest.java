@@ -19,7 +19,7 @@ public class ChartServerConfigurationTest {
 	ChartServer server;
 	@Before
 	public void startServer() throws ParseException, IOException{
-		String []args = {"-p","8686","-wsp","8687","-nws", "40"};
+		String []args = {"-p","8686","-wsp","8687","-nws", "1"};
         server = ChartServer.createNewInstance(args);
         server.start();
 	}
@@ -40,8 +40,6 @@ public class ChartServerConfigurationTest {
         Assert.assertTrue(response.getStatusLine().getStatusCode() == 200);
         Assert.assertEquals(ResourceFileHandler.getResourceAsString("html/samples/example1.html"), ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));
         response.getEntity().getContent().close();
-        
-        server.stop();
     }
   
     

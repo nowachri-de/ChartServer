@@ -1,4 +1,4 @@
-package de.cn.chartserver;
+package de.cn.chartserver.ssl;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.cn.chartserver.ChartServer;
 import de.cn.chartserver.resource.ResourceFileHandler;
 
 public class HttpInsteadOfHttpsTest {
@@ -42,8 +43,6 @@ public class HttpInsteadOfHttpsTest {
 		Assert.assertEquals(ResourceFileHandler.getResourceAsString("html/samples/example1.html"),
 				ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));
 		response.getEntity().getContent().close();
-
-		server.stop();
 	}
 	
 	@Test(expected = javax.net.ssl.SSLHandshakeException.class)
@@ -58,7 +57,5 @@ public class HttpInsteadOfHttpsTest {
 		Assert.assertEquals(ResourceFileHandler.getResourceAsString("html/samples/example1.html"),
 				ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));
 		response.getEntity().getContent().close();
-
-		server.stop();
 	}
 }

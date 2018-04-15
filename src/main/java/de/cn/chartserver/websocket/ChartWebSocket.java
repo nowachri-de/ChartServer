@@ -1,30 +1,23 @@
-package de.cn.chartserver;
+package de.cn.chartserver.websocket;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.security.KeyStore;
-
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 
 import org.java_websocket.WebSocket;
-import org.java_websocket.WebSocketImpl;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.DefaultSSLWebSocketServerFactory;
 import org.java_websocket.server.WebSocketServer;
-import org.pmw.tinylog.Configurator;
-import org.pmw.tinylog.Level;
 import org.pmw.tinylog.Logger;
+
+import com.google.gson.Gson;
 
 import de.cn.chartserver.resource.ResourceFileHandler;
 import de.cn.chartserver.ssl.SSLSetup;
-import fi.iki.elonen.NanoHTTPD;
+import de.cn.chartserver.websocket.dto.Command;
+import de.cn.chartserver.websocket.dto.RequestChart;
 
 public class ChartWebSocket extends WebSocketServer {
 
@@ -49,7 +42,14 @@ public class ChartWebSocket extends WebSocketServer {
 	@Override
 	public void onMessage(WebSocket conn, String message) {
 		Logger.debug(conn.getRemoteSocketAddress().getAddress().getHostAddress() + " message received: " + message);
-
+		Command cmd = (new Gson()).fromJson(message, RequestChart.class);
+		try {
+			String javascript = ResourceFileHandler.getResourceAsString("html/javascript/drawLine2dChart.js");
+			conn.send(javascript);
+		} catch (IOException e) {
+			Logger.error(e);
+		}
+		
 	}
 
 	@Override

@@ -10,7 +10,7 @@ import org.junit.Test;
 import de.cn.chartserver.ChartServer;
 import de.cn.chartserver.ChartServerConfiguration;
 
-public class ChartTest {
+public class LineChart2DTest {
 	
 	ChartServer chartServer;
 	
@@ -32,6 +32,5 @@ public class ChartTest {
 		
 		LineChart2D chart = new LineChart2D(new URI("wss://localhost:8789"));
 		chart.draw(testData);
-		chartServer.stop();
 	}
 }
