@@ -11,9 +11,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.cn.chartserver.ChartServer;
-import de.cn.chartserver.ChartServerConfiguration;
-import de.cn.chartserver.handler.ExampleHandler;
 import de.cn.chartserver.resource.ResourceFileHandler;
 import de.cn.chartserver.util.TestUtil;
 import fi.iki.elonen.NanoHTTPD;
@@ -32,8 +29,8 @@ public class ChartServerTest {
     }
 
     
-    //@Test
-    public void requestExample1PageTest() throws IOException {
+    @Test
+    public void requestExampleTest() throws IOException {
         server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         
         CloseableHttpClient client = TestUtil.newHttpClientInstance();

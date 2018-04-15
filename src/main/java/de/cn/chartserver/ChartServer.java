@@ -2,9 +2,11 @@ package de.cn.chartserver;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.UnknownHostException;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
+
+import javax.net.ssl.KeyManagerFactory;
 
 import org.apache.commons.cli.ParseException;
 import org.pmw.tinylog.Configurator;
@@ -34,27 +36,39 @@ public class ChartServer extends RouterNanoHTTPD {
 		super(config.getHost(), config.getPort());
 		this.configuration = config;
 		
-		setupSSL();
+		setupSSL(config);
 		setupHandlers();
 		setAsyncRunner(new BoundRunner(Executors.newFixedThreadPool(this.configuration.getWebThreadPoolSize())));
 
 		try {
-			setupWebSocket(ResourceFileHandler.getInputStream(config.getKeyStoreLocation()+"/"+config.getKeyStoreFileName()),config.getKeyStorePassword());
-		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
+			setupWebSocket(config);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		}
+		} 
 	}
 
 
 	/**
+	 * Instantiates a secure websocket 
+	 * @throws Exception 
+	 */
+	protected void setupWebSocket(ChartServerConfiguration config) throws Exception{
+		
+		webSocket = new ChartWebSocket(this.configuration.getWebSocketPort());
+		if (config.isWebSocketSecure()){
+			InputStream keystoreStream = ResourceFileHandler.getInputStream(config.getKeyStoreLocation()+"/"+config.getKeyStoreFileName());
+			String password = config.getKeyStorePassword();
+			webSocket.setupSSL(keystoreStream,password);
+		}
+		webSocket.start();
+	}
+	
+	/**
 	 * Instantiates the websocket at the port specified in the configuration
 	 * @throws Exception 
 	 */
-	protected void setupWebSocket(InputStream keyStoreInputStream,String passphrase) throws Exception{
+	protected void setupWebSocket() throws Exception{
 		webSocket = new ChartWebSocket(this.configuration.getWebSocketPort());
-		webSocket.setupSSL(keyStoreInputStream,passphrase);
 		webSocket.start();
 	}
 	
@@ -115,6 +129,23 @@ public class ChartServer extends RouterNanoHTTPD {
 		} catch (IOException e) {
 			Logger.error(e);
 		}
+	}
+
+	protected void setupSSL(ChartServerConfiguration config) {
+		if (config.getProtocol().equals(ChartServerConfiguration.HTTP)){
+			return;
+		}
+		try {
+			InputStream keystoreStream = ResourceFileHandler.getInputStream(config.getKeyStoreLocation() + "/" + config.getKeyStoreFileName());
+			String password = config.getKeyStorePassword();
+            KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keystore.load(keystoreStream, password.toCharArray());
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            keyManagerFactory.init(keystore, password.toCharArray());
+            makeSecure(makeSSLSocketFactory(keystore, keyManagerFactory.getKeyManagers()),null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 	}
 
 	/**

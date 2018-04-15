@@ -2,23 +2,30 @@ package de.cn.chartserver;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.pmw.tinylog.Logger;
 
 /**
  * Used for providing server configuration values
  * 
  */
 public class ChartServerConfiguration {
-
+	public static final String HTTP = "http";
+	public static final String HTTPS = "https";
+	public static final String WSS_PRTOCOL = "wss";
+	public static final String WS_PRTOCOL = "ws";
+	
 	public static final String DEFAULT_KEYSTORE_LOCATION = "ssl";
 	public static final String DEFAULT_KEYSTORE_FILENAME = "keystore.jks";
 	public static final String DEFAULT_KEYSTORE_PASSWORD = "password";
-	public static final String DEFAULT_PROCTOCOL = "https";
+	public static final String DEFAULT_PROCTOCOL = HTTPS;
+	public static final String DEFAULT_WS_PROCTOCOL = WSS_PRTOCOL;
 	public static final String DEFAULT_HOST = "localhost";
 
 	public static final int DEFAULT_WEB_THREAD_POOL_SIZE = 10;
@@ -26,7 +33,6 @@ public class ChartServerConfiguration {
 	public static final int DEFAULT_SERVER_PORT = 8787;
 
 	protected int port = ChartServerConfiguration.DEFAULT_SERVER_PORT;
-
 	protected int webSocketPort = ChartServerConfiguration.DEFAULT_SERVER_PORT + 1;
 	protected int webThreadPoolSize = ChartServerConfiguration.DEFAULT_WEB_THREAD_POOL_SIZE;
 	protected String protocol = DEFAULT_PROCTOCOL;
@@ -34,7 +40,7 @@ public class ChartServerConfiguration {
 	protected String keyStoreLocation = DEFAULT_KEYSTORE_LOCATION;
 	protected String keyStoreFileName = DEFAULT_KEYSTORE_FILENAME;
 	protected String keyStorePassword = DEFAULT_KEYSTORE_PASSWORD;
-
+	protected String wsProtocol = DEFAULT_WS_PROCTOCOL;
 	protected Map<String,Object> routes = new HashMap<>();
 	
 	public Map<String, Object> getRoutes() {
@@ -45,6 +51,21 @@ public class ChartServerConfiguration {
 		this.routes = routes;
 	}
 
+	public void logConfiguration(){
+		Logger.info("server port: " + getPort());
+		Logger.info("web socket port: " + getWebSocketPort());
+		Logger.info("http(s) thread pool size: " + getWebThreadPoolSize());
+		Logger.info("web server protocol: " + getProtocol());
+		Logger.info("web socket protocol: " + getWsProtocol());
+		Logger.info("configured hostname: " + getHost());
+		Logger.info("keystore file: " + getKeyStoreFileName());
+		Logger.info("keystore file resource path: " + getKeyStoreLocation());
+		Logger.info("keystore file password: ***********");
+		Logger.info("Additional Routes (Only the custom added routes are shown here)");
+		for (Entry<String, Object> entry:routes.entrySet()){
+			Logger.info(entry.getKey() + " handled by " + entry.getValue().getClass().getName());
+		}
+	}
 	/**
 	 * Private no arg constructor. Instances of ChartServerconfiguration have to
 	 * be created using the createConfiguration methods.
@@ -66,6 +87,8 @@ public class ChartServerConfiguration {
 		options.addOption("wsp", true, "port at which websocket is listening");
 		options.addOption("h", true, "name of host");
 		options.addOption("nws", true, "maximum number of threads for the web server");
+		options.addOption("http", false, "do not use https for webserver");
+		options.addOption("nowss", false, "do not ssl for websocket");
 		
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmdline = parser.parse(options, args);
@@ -79,6 +102,8 @@ public class ChartServerConfiguration {
 				cmdline.getOptionValue("wsp", String.valueOf(ChartServerConfiguration.DEFAULT_WEBSOCKET_PORT))));
 		config.setWebThreadPoolSize(Integer.parseInt(
 				cmdline.getOptionValue("nws", String.valueOf(ChartServerConfiguration.DEFAULT_WEB_THREAD_POOL_SIZE))));
+		config.setProtocol(cmdline.hasOption("http")?HTTP:HTTPS);
+		config.setWsProtocol(cmdline.hasOption("nowss")?WS_PRTOCOL:WSS_PRTOCOL);
 		
 		return config;
 	}
@@ -207,6 +232,18 @@ public class ChartServerConfiguration {
 
 	public void setKeyStorePassword(String keyStorePassword) {
 		this.keyStorePassword = keyStorePassword;
+	}
+
+	public boolean isWebSocketSecure() {
+		return getWsProtocol().equals(WSS_PRTOCOL);
+	}
+
+	public String getWsProtocol() {
+		return wsProtocol;
+	}
+
+	public void setWsProtocol(String wsProtocol) {
+		this.wsProtocol = wsProtocol;
 	}
 
 }
