@@ -27,6 +27,7 @@ public abstract class Chart extends WebSocketClient {
 			setupSSL();
 		} catch (Exception e) {
 			Logger.error(e);
+			throw new RuntimeException(e);
 		}
 	}
 

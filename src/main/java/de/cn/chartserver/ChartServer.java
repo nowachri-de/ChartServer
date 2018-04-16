@@ -66,15 +66,6 @@ public class ChartServer extends RouterNanoHTTPD {
 	}
 	
 	/**
-	 * Instantiates the websocket at the port specified in the configuration
-	 * @throws Exception 
-	 */
-	protected void setupWebSocket() throws Exception{
-		webSocket = new ChartWebSocket(this.configuration.getWebSocketPort());
-		webSocket.start();
-	}
-	
-	/**
 	 * Instantiate and return a ChartServer object based on the default configuration
 	 * 
 	 * @return ChartServer instance

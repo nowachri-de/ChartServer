@@ -8,7 +8,7 @@ function WebSocketTest() {
 		ws.onopen = function() {
 			// Web Socket is connected, send data using send()
 			ws.send("{\"command\":\"SendLine2DChart\"}");
-			alert("Message is sent...");
+			
 		};
 
 		ws.onmessage = function(evt) {

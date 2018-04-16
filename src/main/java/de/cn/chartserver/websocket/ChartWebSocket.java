@@ -44,7 +44,7 @@ public class ChartWebSocket extends WebSocketServer {
 		Logger.debug(conn.getRemoteSocketAddress().getAddress().getHostAddress() + " message received: " + message);
 		Command cmd = (new Gson()).fromJson(message, RequestChart.class);
 		try {
-			String javascript = ResourceFileHandler.getResourceAsString("html/javascript/drawLine2dChart.js");
+			String javascript = ResourceFileHandler.getResourceAsString("html/javascript/line2d.js");
 			conn.send(javascript);
 		} catch (IOException e) {
 			Logger.error(e);
