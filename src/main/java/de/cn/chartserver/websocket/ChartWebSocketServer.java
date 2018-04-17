@@ -142,7 +142,7 @@ public class ChartWebSocketServer extends WebSocketServer {
         }
         ChartWebSocketServer s = new ChartWebSocketServer( port );
         s.start();
-        System.out.println( "ChatServer started on port: " + s.getPort() );
+        Logger.info("ChatServer started on port: " + s.getPort() );
 
         BufferedReader sysin = new BufferedReader( new InputStreamReader( System.in ) );
         while ( true ) {

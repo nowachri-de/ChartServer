@@ -19,9 +19,19 @@ import de.cn.chartserver.ChartServer;
 import de.cn.chartserver.resource.ResourceFileHandler;
 import de.cn.chartserver.websocket.WebSocketTestClient;
 
+/**
+ * Test if the server can be configured in order not to use SSL. So in this test case
+ * NanoHTTPD as well as the websocket will not use TLS.
+ */
 public class NoHttpsAndNoWSS {
-	ChartServer server;
-
+	final static String TEST_URL_HTTP="http://localhost:8686/example";
+	final static String TEST_URL_HTTPS="https://localhost:8686/example";
+	
+	final static String TEST_SOCKET_URL="ws://localhost:8687";
+	final static String TEST_RESOURCE = "html/samples/example1.html";
+	
+    ChartServer server;
+	
 	@Before
 	public void startServer() throws ParseException, IOException {
 		String[] args = { "-p", "8686", "-wsp", "8687", "-http", "-nowss" };
@@ -38,20 +48,35 @@ public class NoHttpsAndNoWSS {
 	public void makeHttpCall() throws IOException, ParseException, URISyntaxException, InterruptedException {
 
 		CloseableHttpClient client = HttpClients.createMinimal();
-		HttpGet httpGet = new HttpGet("http://localhost:8686/example");
+		HttpGet httpGet = new HttpGet(TEST_URL_HTTP);
 		httpGet.setHeader("Accept", "text/html");
 
 		HttpResponse response = client.execute(httpGet);
 
 		Assert.assertTrue(response.getStatusLine().getStatusCode() == 200);
-		Assert.assertEquals(ResourceFileHandler.getResourceAsString("html/samples/example1.html"),
+		Assert.assertEquals(ResourceFileHandler.getResourceAsString(TEST_RESOURCE),
 				ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));
 		response.getEntity().getContent().close();
 
-		WebSocketTestClient testClient = new WebSocketTestClient(new URI("ws://localhost:8687"));
+		WebSocketTestClient testClient = new WebSocketTestClient(new URI(TEST_SOCKET_URL));
 		Assert.assertTrue(testClient.connectBlocking());
 		testClient.send("Unit Test");
 		testClient.close();
 	}
+	
+
+    @Test(expected = javax.net.ssl.SSLHandshakeException.class)
+    public void httpsMustFail() throws IOException, ParseException {
+
+        CloseableHttpClient client = HttpClients.createMinimal();
+        HttpGet httpGet = new HttpGet(TEST_URL_HTTPS);
+        httpGet.setHeader("Accept", "text/html");
+
+        HttpResponse response = client.execute(httpGet);
+        Assert.assertTrue(response.getStatusLine().getStatusCode() == 200);
+        Assert.assertEquals(ResourceFileHandler.getResourceAsString("html/samples/example1.html"),
+                ResourceFileHandler.inputStreamToString(response.getEntity().getContent(), StandardCharsets.UTF_8));
+        response.getEntity().getContent().close();
+    }
 
 }

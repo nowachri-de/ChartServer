@@ -15,6 +15,9 @@ import de.cn.chartserver.resource.ResourceFileHandler;
 import de.cn.chartserver.util.TestUtil;
 import fi.iki.elonen.NanoHTTPD;
 
+/**
+ * Test if example URL can be called using https
+ */
 public class ChartServerTest {
     ChartServer server;
     
@@ -29,6 +32,12 @@ public class ChartServerTest {
     }
 
     
+    /**
+     * Test if listening port is set to the expected value and if the configured URL
+     * can be called using https
+     * 
+     * @throws IOException
+     */
     @Test
     public void requestExampleTest() throws IOException {
         server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);

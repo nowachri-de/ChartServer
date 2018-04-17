@@ -12,9 +12,17 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.pmw.tinylog.Logger;
 
+/**
+ * Class providing utility methods used by unit tests
+ */
 public class TestUtil {
+    
+    /**
+     * Creates an ClosableHttpClient which accept any kind of certificate.
+     * 
+     * @return
+     */
     public static CloseableHttpClient newHttpClientInstance() {
-
         SSLContext sslContext = null;
         CloseableHttpClient client = null;
         try {

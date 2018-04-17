@@ -23,19 +23,16 @@ public class WebSocketTestClient extends WebSocketClient {
 
 	@Override
 	public void onOpen(ServerHandshake handshakedata) {
-		System.out.println("Connected");
-
 	}
 
 	@Override
 	public void onMessage(String message) {
-		System.out.println("got: " + message);
 		callCount++;
 	}
 	
 	@Override
 	public void onClose(int code, String reason, boolean remote) {
-		System.out.println("Disconnected");
+		
 	}
 
 	@Override
