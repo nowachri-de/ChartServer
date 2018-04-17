@@ -27,6 +27,7 @@ public class ChartServerConfiguration {
 	public static final String DEFAULT_PROCTOCOL = HTTPS;
 	public static final String DEFAULT_WS_PROCTOCOL = WSS_PRTOCOL;
 	public static final String DEFAULT_HOST = "localhost";
+	public static final Boolean DEFAULT_USE_EXTERNAL_KEYSTORE = false;
 
 	public static final int DEFAULT_WEB_THREAD_POOL_SIZE = 10;
 	public static final int DEFAULT_WEBSOCKET_PORT = 8788;
@@ -41,6 +42,8 @@ public class ChartServerConfiguration {
 	protected String keyStoreFileName = DEFAULT_KEYSTORE_FILENAME;
 	protected String keyStorePassword = DEFAULT_KEYSTORE_PASSWORD;
 	protected String wsProtocol = DEFAULT_WS_PROCTOCOL;
+	protected boolean useExternalKeystore = DEFAULT_USE_EXTERNAL_KEYSTORE;
+	
 	protected Map<String,Object> routes = new HashMap<>();
 	
 	public Map<String, Object> getRoutes() {
@@ -245,5 +248,13 @@ public class ChartServerConfiguration {
 	public void setWsProtocol(String wsProtocol) {
 		this.wsProtocol = wsProtocol;
 	}
+
+    public boolean isUseExternalKeystore() {
+        return useExternalKeystore;
+    }
+
+    public void setUseExternalKeystore(boolean useExternalKeystore) {
+        this.useExternalKeystore = useExternalKeystore;
+    }
 
 }

@@ -1,5 +1,7 @@
 package de.cn.chartserver;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -54,10 +56,22 @@ public class ChartServer extends RouterNanoHTTPD {
     protected void setupWebSocket(ChartServerConfiguration config) {
 
         try {
-            webSocketServer = new ChartWebSocketServer(this.configuration.getWebSocketPort());
+            webSocketServer = new ChartWebSocketServer(configuration.getWebSocketPort());
             if (config.isWebSocketSecure()) {
-                InputStream keystoreStream = ResourceFileHandler.getInputStream(config.getKeyStoreLocation() + "/" + config.getKeyStoreFileName());
+                InputStream keystoreStream; 
                 String password = config.getKeyStorePassword();
+                String keyStoreLocation = config.getKeyStoreLocation() + "/" + config.getKeyStoreFileName();
+                
+                Logger.debug("Keystore location " + keyStoreLocation);
+                
+                if (configuration.isUseExternalKeystore()){
+                    Logger.debug("Exnternal keystore location specified in configuration");
+                    keystoreStream = new FileInputStream(new File(keyStoreLocation));
+                }else{
+                    Logger.debug("Internal keystore location specified in configuration");
+                    keystoreStream = ResourceFileHandler.getInputStream(config.getKeyStoreLocation() + "/" + config.getKeyStoreFileName());
+                }
+                
                 webSocketServer.setupSSL(keystoreStream, password);
             }
             webSocketServer.start();
@@ -133,19 +147,40 @@ public class ChartServer extends RouterNanoHTTPD {
         }
     }
 
+    /**
+     * Setup SSL connections in case this is requested. Otherwise only http requests will be accepted
+     * 
+     * @param config ChartServerConfiguration required to retrieve keystore location and password
+     */
     protected void setupSSL(ChartServerConfiguration config) {
         if (config.getProtocol().equals(ChartServerConfiguration.HTTP)) {
+            Logger.debug("No TLS is requested. Only http calls will be accepted");
             return;
         }
+        Logger.debug("TLS is requested. Only https calls will be accepted");
+        
+        InputStream keystoreStream;
+        String password;
+        String keyStoreLocation = config.getKeyStoreLocation() + "/" + config.getKeyStoreFileName();
+        Logger.debug("keystore location is " + keyStoreLocation);
+        
         try {
-            InputStream keystoreStream = ResourceFileHandler.getInputStream(config.getKeyStoreLocation() + "/" + config.getKeyStoreFileName());
-            String password = config.getKeyStorePassword();
+            if (configuration.isUseExternalKeystore()){
+                keystoreStream = new FileInputStream(new File(keyStoreLocation));
+                Logger.debug("Usage of external keystore is requested. Default keystore will not be used");
+            }else{
+                keystoreStream = ResourceFileHandler.getInputStream(keyStoreLocation);
+                Logger.debug("Usage of resource keystore is requested. Default keystore will be used.");
+            }
+            
+            password = config.getKeyStorePassword();
             KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
             keystore.load(keystoreStream, password.toCharArray());
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(keystore, password.toCharArray());
             makeSecure(makeSSLSocketFactory(keystore, keyManagerFactory.getKeyManagers()), null);
         } catch (Exception e) {
+            Logger.error(e);
             throw new RuntimeException(e);
         }
     }
