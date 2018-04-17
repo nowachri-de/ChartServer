@@ -213,9 +213,11 @@ public class ChartServer extends RouterNanoHTTPD {
         return webSocketServer;
     }
 
-    public static void main(String[] args) throws ParseException {
+    public void setLoggingLevel(){
         Configurator.currentConfig().formatPattern("{date:yyyy-MM-dd HH:mm:ss} {level}:   {message}").level(Level.DEBUG).activate();
-
+    }
+    public static void main(String[] args) throws ParseException {
+     
         ChartServer server = ChartServer.createNewInstance(args);
 
         Logger.info("Server port: " + server.getConfiguration().getPort());

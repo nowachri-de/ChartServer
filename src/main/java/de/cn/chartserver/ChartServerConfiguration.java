@@ -27,6 +27,7 @@ public class ChartServerConfiguration {
 	public static final String DEFAULT_PROCTOCOL = HTTPS;
 	public static final String DEFAULT_WS_PROCTOCOL = WSS_PRTOCOL;
 	public static final String DEFAULT_HOST = "localhost";
+	public static final String DEFAULT_LOGGING_LEVEL = "info";
 	public static final Boolean DEFAULT_USE_EXTERNAL_KEYSTORE = false;
 
 	public static final int DEFAULT_WEB_THREAD_POOL_SIZE = 10;
@@ -42,6 +43,7 @@ public class ChartServerConfiguration {
 	protected String keyStoreFileName = DEFAULT_KEYSTORE_FILENAME;
 	protected String keyStorePassword = DEFAULT_KEYSTORE_PASSWORD;
 	protected String wsProtocol = DEFAULT_WS_PROCTOCOL;
+	protected String loggingLevel = DEFAULT_LOGGING_LEVEL;
 	protected boolean useExternalKeystore = DEFAULT_USE_EXTERNAL_KEYSTORE;
 	
 	protected Map<String,Object> routes = new HashMap<>();
