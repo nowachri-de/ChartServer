@@ -14,6 +14,4 @@ public class RequestChart implements Command{
 	public String getCommand() {
 		return command;
 	}
-	
-	
 }

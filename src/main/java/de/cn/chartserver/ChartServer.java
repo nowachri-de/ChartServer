@@ -18,186 +18,179 @@ import de.cn.chartserver.handler.JavaScriptHandler;
 import de.cn.chartserver.handler.LineChart2DHandler;
 import de.cn.chartserver.resource.ResourceFileHandler;
 import de.cn.chartserver.threadpool.BoundRunner;
-import de.cn.chartserver.websocket.ChartWebSocket;
+import de.cn.chartserver.websocket.ChartWebSocketServer;
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.router.RouterNanoHTTPD;
 import fi.iki.elonen.util.ServerRunner;
 
 public class ChartServer extends RouterNanoHTTPD {
-	protected ChartServerConfiguration configuration;
-	protected ChartWebSocket webSocket;
-	
-	/**
-	 * Constructor expecting server configuration as parameter.
-	 * 
-	 * @param config
-	 *            Configuration object of server
-	 * @throws Exception 
-	 */
-	protected ChartServer(ChartServerConfiguration config){
-		super(config.getHost(), config.getPort());
-		this.configuration = config;
-		
-		setupSSL(config);
-		setupHandlers();
-		setAsyncRunner(new BoundRunner(Executors.newFixedThreadPool(this.configuration.getWebThreadPoolSize())));
+    protected ChartServerConfiguration configuration;
+    protected ChartWebSocketServer webSocketServer;
 
-		try {
-			setupWebSocket(config);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		} 
-	}
+    /**
+     * Constructor expecting server configuration as parameter.
+     * 
+     * @param config Configuration object of server
+     * @throws Exception
+     */
+    protected ChartServer(ChartServerConfiguration config) {
+        super(config.getHost(), config.getPort());
+        this.configuration = config;
+
+        setupSSL(config);
+        setupWebSocket(config);
+        setupHandlers();
+        setAsyncRunner(new BoundRunner(Executors.newFixedThreadPool(this.configuration.getWebThreadPoolSize())));
+    }
 
 
-	/**
-	 * Instantiates a secure websocket 
-	 * @throws Exception 
-	 */
-	protected void setupWebSocket(ChartServerConfiguration config) throws Exception{
-		
-		webSocket = new ChartWebSocket(this.configuration.getWebSocketPort());
-		if (config.isWebSocketSecure()){
-			InputStream keystoreStream = ResourceFileHandler.getInputStream(config.getKeyStoreLocation()+"/"+config.getKeyStoreFileName());
-			String password = config.getKeyStorePassword();
-			webSocket.setupSSL(keystoreStream,password);
-		}
-		webSocket.start();
-	}
-	
-	/**
-	 * Instantiate and return a ChartServer object based on the default configuration
-	 * 
-	 * @return ChartServer instance
-	 */
-	public static ChartServer createNewInstance() {
-		return ChartServer.createNewInstance(ChartServerConfiguration.createConfiguration());
-	}
 
-	/**
-	 * @param config ChartServerConfiguration
-	 * @return ChartServer instance
-	 */
-	public static ChartServer createNewInstance(ChartServerConfiguration config) {
-		return new ChartServer(config);
-	}
+    /**
+     * Instantiate a websocket. The websocket listening port will be set as specified in the ChartServerConfiguration. In case a secure WebSocket has to be
+     * created, the keystorelocation and the keystore password will be read from the ChartServerConfiguration.
+     * 
+     * @param config ChartServerConfiguration
+     */
+    protected void setupWebSocket(ChartServerConfiguration config) {
 
-	/**
-	 * @param args Commandline arguments
-	 * @return ChartServer instance created based on the given arguments
-	 * @throws ParseException In case wrong or misspelled arguments have been provided
-	 */
-	public static ChartServer createNewInstance(String[] args) throws ParseException {
-		return ChartServer.createNewInstance(ChartServerConfiguration.createConfiguration(args));
-	}
+        try {
+            webSocketServer = new ChartWebSocketServer(this.configuration.getWebSocketPort());
+            if (config.isWebSocketSecure()) {
+                InputStream keystoreStream = ResourceFileHandler.getInputStream(config.getKeyStoreLocation() + "/" + config.getKeyStoreFileName());
+                String password = config.getKeyStorePassword();
+                webSocketServer.setupSSL(keystoreStream, password);
+            }
+            webSocketServer.start();
+        } catch (Exception e) {
+            Logger.error(e);
+            throw new RuntimeException(e);
+        }
+    }
 
-	/**
-	 * Add a route to this server. A route will execute the specified handler if the path is matched
-	 */
-	protected void setupHandlers() {
-		addRoute("/",de.cn.chartserver.handler.IndexHandler.class);
-		addRoute("/js/chartserver.js",JavaScriptHandler.class);
-		addRoute(LineChart2DHandler.URL, LineChart2DHandler.class);
-		addRoute("/example",ExampleHandler.class);
-	}
+    /**
+     * Instantiate and return a ChartServer object based on the default configuration
+     * 
+     * @return ChartServer instance
+     */
+    public static ChartServer createNewInstance() {
+        return ChartServer.createNewInstance(ChartServerConfiguration.createConfiguration());
+    }
 
-	/**
-     * Add the routes Every route is an absolute path Parameters starts with ":"
-     * Handler class should implement @UriResponder interface If the handler not
+    /**
+     * @param config ChartServerConfiguration
+     * @return ChartServer instance
+     */
+    public static ChartServer createNewInstance(ChartServerConfiguration config) {
+        return new ChartServer(config);
+    }
+
+    /**
+     * @param args Commandline arguments
+     * @return ChartServer instance created based on the given arguments
+     * @throws ParseException In case wrong or misspelled arguments have been provided
+     */
+    public static ChartServer createNewInstance(String[] args) throws ParseException {
+        return ChartServer.createNewInstance(ChartServerConfiguration.createConfiguration(args));
+    }
+
+    /**
+     * Add a route to this server. A route will execute the specified handler if the path is matched
+     */
+    protected void setupHandlers() {
+        addRoute("/", de.cn.chartserver.handler.IndexHandler.class);
+        addRoute("/js/chartserver.js", JavaScriptHandler.class);
+        addRoute(LineChart2DHandler.URL, LineChart2DHandler.class);
+        addRoute("/example", ExampleHandler.class);
+    }
+
+    /**
+     * Add the routes Every route is an absolute path Parameters starts with ":" Handler class should implement @UriResponder interface If the handler not
      * implement UriResponder interface - toString() is used
      */
     @Override
     public void addMappings() {
-       
+
     }
-	/**
-	 * @see fi.iki.elonen.router.RouterNanoHTTPD#addRoute(java.lang.String,
-	 *      java.lang.Class, java.lang.Object[])
-	 */
-	@Override
-	public void addRoute(String url, Class<?> handler, Object... initParameter) {
-		configuration.routes.put(url, handler);
-		super.addRoute(url, handler, this.getConfiguration());
-	}
 
-	/**
-	 * Sets up a secure socket which makes it possible to handle TLS (SSL)
-	 * requests.
-	 */
-	protected void setupSSL() {
-		try {
-			setupSecureSocket("/"+configuration.getKeyStoreLocation(),
-					configuration.getKeyStoreFileName(),
-					configuration.getKeyStorePassword());
-			
-		} catch (IOException e) {
-			Logger.error(e);
-		}
-	}
+    /**
+     * @see fi.iki.elonen.router.RouterNanoHTTPD#addRoute(java.lang.String, java.lang.Class, java.lang.Object[])
+     */
+    @Override
+    public void addRoute(String url, Class<?> handler, Object... initParameter) {
+        configuration.routes.put(url, handler);
+        super.addRoute(url, handler, this.getConfiguration());
+    }
 
-	protected void setupSSL(ChartServerConfiguration config) {
-		if (config.getProtocol().equals(ChartServerConfiguration.HTTP)){
-			return;
-		}
-		try {
-			InputStream keystoreStream = ResourceFileHandler.getInputStream(config.getKeyStoreLocation() + "/" + config.getKeyStoreFileName());
-			String password = config.getKeyStorePassword();
+    /**
+     * Sets up a secure socket which makes it possible to handle TLS (SSL) requests.
+     */
+    protected void setupSSL() {
+        try {
+            setupSecureSocket("/" + configuration.getKeyStoreLocation(), configuration.getKeyStoreFileName(), configuration.getKeyStorePassword());
+
+        } catch (IOException e) {
+            Logger.error(e);
+        }
+    }
+
+    protected void setupSSL(ChartServerConfiguration config) {
+        if (config.getProtocol().equals(ChartServerConfiguration.HTTP)) {
+            return;
+        }
+        try {
+            InputStream keystoreStream = ResourceFileHandler.getInputStream(config.getKeyStoreLocation() + "/" + config.getKeyStoreFileName());
+            String password = config.getKeyStorePassword();
             KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
             keystore.load(keystoreStream, password.toCharArray());
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(keystore, password.toCharArray());
-            makeSecure(makeSSLSocketFactory(keystore, keyManagerFactory.getKeyManagers()),null);
+            makeSecure(makeSSLSocketFactory(keystore, keyManagerFactory.getKeyManagers()), null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-	}
+    }
 
-	/**
-	 * Start the server.
-	 * 
-	 * @throws IOException
-	 *             if the socket is in use.
-	 */
-	@Override
-	public void stop() {
-		super.stop();
-		try {
-			this.webSocket.stop();
-		} catch (InterruptedException | IOException e) {
-			Logger.error(e);
-		}
-	}
-	
-	
-	protected void setupSecureSocket(String pathToKeyStore, String keyStoreFileName, String keyStorePassword)
-			throws IOException {
-		makeSecure(
-				NanoHTTPD.makeSSLSocketFactory(pathToKeyStore + "/" + keyStoreFileName, keyStorePassword.toCharArray()),
-				null);
-	}
+    /**
+     * Start the server.
+     * 
+     * @throws IOException if the socket is in use.
+     */
+    @Override
+    public void stop() {
+        super.stop();
+        try {
+            this.webSocketServer.stop();
+        } catch (InterruptedException | IOException e) {
+            Logger.error(e);
+        }
+    }
 
-	public ChartServerConfiguration getConfiguration() {
-		return configuration;
-	}
-	
-	public ChartWebSocket getWebSocket() {
-		return webSocket;
-	}
 
-	public static void main(String[] args) throws ParseException {
-		Configurator.currentConfig().formatPattern("{date:yyyy-MM-dd HH:mm:ss} {level}:   {message}").level(Level.DEBUG)
-				.activate();
+    protected void setupSecureSocket(String pathToKeyStore, String keyStoreFileName, String keyStorePassword) throws IOException {
+        makeSecure(NanoHTTPD.makeSSLSocketFactory(pathToKeyStore + "/" + keyStoreFileName, keyStorePassword.toCharArray()), null);
+    }
 
-		ChartServer server = ChartServer.createNewInstance(args);
+    public ChartServerConfiguration getConfiguration() {
+        return configuration;
+    }
 
-		Logger.info("Server port: " + server.getConfiguration().getPort());
-		Logger.info("Websocket port " + server.getConfiguration().getWebSocketPort());
-		Logger.info("Number of web threads: " + server.getConfiguration().getWebThreadPoolSize());
+    public ChartWebSocketServer getWebSocketServer() {
+        return webSocketServer;
+    }
 
-		for (String path : new ArrayList<String>(server.getConfiguration().getRoutes().keySet())) {
-			Logger.info("registered path " + path);
-		}
-		ServerRunner.executeInstance(server);
-	}
+    public static void main(String[] args) throws ParseException {
+        Configurator.currentConfig().formatPattern("{date:yyyy-MM-dd HH:mm:ss} {level}:   {message}").level(Level.DEBUG).activate();
+
+        ChartServer server = ChartServer.createNewInstance(args);
+
+        Logger.info("Server port: " + server.getConfiguration().getPort());
+        Logger.info("Websocket port " + server.getConfiguration().getWebSocketPort());
+        Logger.info("Number of web threads: " + server.getConfiguration().getWebThreadPoolSize());
+
+        for (String path : new ArrayList<String>(server.getConfiguration().getRoutes().keySet())) {
+            Logger.info("registered path " + path);
+        }
+        ServerRunner.executeInstance(server);
+    }
 
 }

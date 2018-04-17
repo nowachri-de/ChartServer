@@ -15,7 +15,8 @@ import de.cn.chartserver.ChartServerConfiguration;
 import de.cn.chartserver.resource.ResourceFileHandler;
 
 public class WebSocketTestClient extends WebSocketClient {
-
+    protected int callCount = 0;
+    
 	public WebSocketTestClient(URI serverUri) {
 		super(serverUri);
 	}
@@ -29,9 +30,9 @@ public class WebSocketTestClient extends WebSocketClient {
 	@Override
 	public void onMessage(String message) {
 		System.out.println("got: " + message);
-
+		callCount++;
 	}
-
+	
 	@Override
 	public void onClose(int code, String reason, boolean remote) {
 		System.out.println("Disconnected");
@@ -41,6 +42,10 @@ public class WebSocketTestClient extends WebSocketClient {
 	public void onError(Exception ex) {
 		ex.printStackTrace();
 
+	}
+	
+	public int getCallCount(){
+	    return callCount;
 	}
 	
 	public void setupSSL() throws Exception {
